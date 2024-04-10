@@ -1,0 +1,29 @@
+workflow:
+    - parser config file: acquire information from config file or if there isn't take the default and initialize struct and class
+    - "socket" server client run? file: organize all concern about server and client think to keep alive
+    - "HTTP" request? response? file: working for
+
+parser:
+    read config file check if is ok and populate struct
+config:
+    error check? initialize?
+server:
+    initialize all about server :
+        create socket
+        bind socket
+        listen on the socket
+        accept connection
+        send and receive data? maybe is HTTP block
+        disconnect?
+client:
+    initialize all about client :
+        create socket
+        connect to the server
+        send and receive data
+        disconnect??
+request: see webserver_flowchart
+
+response:
+
+
+
