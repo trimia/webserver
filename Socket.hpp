@@ -2,12 +2,14 @@
 #define _Socket_HPP_
 
 #include "include.h"
-
+#include "Response.hpp"
+#include "Request.hpp"
 
 // ******************************************************** //
 //                         CLASSES                         //
 // ****************************************************** //
-
+class Response;
+class Request;
 class	Socket
 {
 	public	:
@@ -17,11 +19,14 @@ class	Socket
 		Socket &operator= (const Socket &obj);
         //maybe int is better because of bind listen and accept return an int 0 or errno
         //server side
-        bool bindSocket(SOCKET serversocket, uint16_t port);
-        bool listenOnSocket(SOCKET serversocket);
-        bool acceptConnection(SOCKET serversocket);
+        //think about pass sokcet to function or the object server;
+        bool bindSocket(SOCKET serverSocket, uint16_t port); //maybe the port is not necessary -> getport
+        bool listenOnSocket(SOCKET serverSocket);
+        bool acceptConnection(SOCKET serverSocket);
         //client side
-        bool connectsocket()
+        bool connectsocket(SOCKET clientSocket, uint16_t port);
+        int sendData(SOCKET connectedSocket, Response msg);
+        int receiveData(SOCKET acceptedSocket,Request httpRequest);
 
 	private	:
 

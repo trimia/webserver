@@ -47,6 +47,10 @@
 # define ISVALIDSOCKET(s) ((s) >= 0)
 # define CLOSESOCKET(s) close(s)
 # define SOCKET_ERROR -1
+//# define RCV_BUF_SIZE (MAX_HTTP_HEAD_LINE > MAX_HTTP_REQ_LINE ? MAX_HTTP_HEAD_LINE : MAX_HTTP_REQ_LINE)
+# define RCV_BUF_SIZE 8000
+
+# define BUFFER 40000
 # define RED		"\033[0;31m"
 # define GREEN		"\033[0;32m"
 # define YELLOW		"\033[0;33m"

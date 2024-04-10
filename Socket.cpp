@@ -13,12 +13,12 @@ Socket::Socket()
 	    std::cout << "Socket : Default Constructor Called" << std::endl;
 }
 
-bool Socket::bindSocket(SOCKET serversocket,uint16_t port) {
+bool Socket::bindSocket(SOCKET serverSocket,uint16_t port) {
     sockaddr_in service;
     service.sin_family=AF_INET;
 //    InetPton() is necesary? find something you can use
     service.sin_port= htons(port);
-    if(bind(serversocket,(sockaddr*)&service, sizeof(service)) == SOCKET_ERROR)
+    if(bind(serverSocket,(sockaddr*)&service, sizeof(service)) == SOCKET_ERROR)
     {
         std::cout<<"bind failed"<<GETSOCKETERRNO()<<std::endl;
         return (false);
@@ -29,9 +29,9 @@ bool Socket::bindSocket(SOCKET serversocket,uint16_t port) {
     }
 }
 
-bool Socket::listenOnSocket(SOCKET serversocket) {
+bool Socket::listenOnSocket(SOCKET serverSocket) {
     //choose how much connection ????
-    if(listen(serversocket,MAX_N_CONNECTION))
+    if(listen(serverSocket,MAX_N_CONNECTION))
     {
         std::cout<<"error on listen"<<GETSOCKETERRNO()<<std::endl;
         return false;
@@ -41,15 +41,61 @@ bool Socket::listenOnSocket(SOCKET serversocket) {
     }
 }
 
-bool Socket::acceptConnection(SOCKET serversocket) {
+bool Socket::acceptConnection(SOCKET serverSocket) {
     SOCKET acceptSocket;
-    acceptSocket= accept(serversocket,NULL,NULL);
+    acceptSocket= accept(serverSocket,NULL,NULL);
     if(acceptSocket==INVALID_SOCKET)
     {
         std::cout<<"accepted failed"<<GETSOCKETERRNO()<<std::endl;
         return false;
     }
     return true;
+}
+
+bool Socket::connectsocket(SOCKET clientSocket, uint16_t port) {
+    sockaddr_in clientService;
+    clientService.sin_family = AF_INET;
+//    InetPton() is necesary? find something you can use
+    clientService.sin_port = htons(port);
+    if(connect(clientSocket,(sockaddr*)&clientService, sizeof(clientService))==SOCKET_ERROR)
+    {
+        std::cout<<"connection to socket failed"<<GETSOCKETERRNO()<<std::endl;
+        return false;
+    }else
+    {
+        std::cout<<"client connect can start sending and receiving data"<<std::endl;
+        return true;
+    }
+}
+
+int Socket::sendData(SOCKET connectedSocket,Response msg) {
+    int byteCount = send(connectedSocket,(char*)&msg.getcontent , sizeof(msg), 0);
+    if(byteCount==SOCKET_ERROR)
+    {
+        std::cout<<"send error"<<GETSOCKETERRNO()<<std::endl;
+        return SOCKET_ERROR;
+    }else
+    {
+        std::cout<<"send "<<byteCount<<" byte"<<std::endl;
+        return byteCount;
+    }
+}
+
+int Socket::receiveData(SOCKET acceptedSocket, Request httpRequest) {
+    char rcv_buffer[RCV_BUF_SIZE];
+    memset(rcv_buffer,0,RCV_BUF_SIZE);
+    int byteCount=(int)recv(acceptedSocket,rcv_buffer, RCV_BUF_SIZE,0);
+    if(byteCount<=0)
+    {
+        std::cout<<"receive data error"<<GETSOCKETERRNO()<<std::endl;
+        return SOCKET_ERROR;
+    }else
+    {
+        std::cout<<"receive data, "<<byteCount<<"byte"<<std::endl;
+        httpRequest.str.append(rcv_buffer,RCV_BUF_SIZE);
+
+        return byteCount;
+    }
 }
 
 Socket::~Socket()
