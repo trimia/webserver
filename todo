@@ -1,3 +1,13 @@
+- socket explanation video part 1 and 2 https://www.youtube.com/watch?v=gntyAFoZp-E
+multiplexing:
+    - if we want to use select() :
+                                    - https://codereview.stackexchange.com/questions/111310/select-server-implementation
+                                    - https://italiancoders.it/the-big-select-come-usare-la-select2-in-c-e-c-pt-1/
+                                    - https://italiancoders.it/the-big-select-come-usare-la-select2-in-c-e-c-pt-2/
+    - poll() or select():
+                            - https://mecha-mind.medium.com/a-non-threaded-chat-server-in-c-53dadab8e8f3
+                            - https://www.ibm.com/docs/en/i/7.4?topic=designs-using-poll-instead-select
+                            -
 workflow:
     - parser config file: acquire information from config file or if there isn't take the default and initialize struct and class
     - "socket" server client run? file: organize all concern about server and client think to keep alive
@@ -22,8 +32,12 @@ client:
         send and receive data
         disconnect??
 request: see webserver_flowchart
+        - https://freedium.cfd/https://medium.com/from-the-scratch/http-server-what-do-you-need-to-know-to-build-a-simple-http-server-from-scratch-d1ef8945e4fa
 
 response:
+
+mainly request response key:
+    - https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Request_fields
 
 
 
