@@ -12,11 +12,11 @@ Socket::Socket()
     else
 	    std::cout << "Socket : Default Constructor Called" << std::endl;
 }
-
+//probably we have to adapt the variable of the function to pass server and sockaddr_in
 bool Socket::bindSocket(SOCKET serverSocket,uint16_t port) {
     sockaddr_in service;
     service.sin_family=AF_INET;
-//    InetPton() is necesary? find something you can use
+//    InetPton() is necesary? find something you can use --> inet_addr() maybe this in servre function
     service.sin_port= htons(port);
     if(bind(serverSocket,(sockaddr*)&service, sizeof(service)) == SOCKET_ERROR)
     {
@@ -55,6 +55,7 @@ bool Socket::acceptConnection(SOCKET serverSocket) {
 bool Socket::connectsocket(SOCKET clientSocket, uint16_t port) {
     sockaddr_in clientService;
     clientService.sin_family = AF_INET;
+    inet_pton(AF_INET,"127.0.0.1",&clientService.sin_addr.s_addr);
 //    InetPton() is necesary? find something you can use
     clientService.sin_port = htons(port);
     if(connect(clientSocket,(sockaddr*)&clientService, sizeof(clientService))==SOCKET_ERROR)
