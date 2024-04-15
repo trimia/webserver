@@ -2,6 +2,7 @@
 
 int main(int argc, char** argv)
 {
+    std::cout<<"bella"<<std::endl;
     /*
      * check arg error
      * check config file ?

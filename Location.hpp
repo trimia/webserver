@@ -1,7 +1,7 @@
 #ifndef _Location_HPP_
 #define _Location_HPP_
 
-#include <iostream>
+#include "include.h"
 
 // ******************************************************** //
 //                         CLASSES                         //

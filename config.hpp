@@ -1,7 +1,7 @@
 #ifndef _config_HPP_
 #define _config_HPP_
 
-#include <iostream>
+#include "include.h"
 
 // ******************************************************** //
 //                         CLASSES                         //
