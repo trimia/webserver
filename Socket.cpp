@@ -52,7 +52,7 @@ bool Socket::acceptConnection(SOCKET serverSocket) {
     return true;
 }
 
-bool Socket::connectsocket(SOCKET clientSocket, uint16_t port) {
+bool Socket::connectSocket(SOCKET clientSocket, uint16_t port) {
     sockaddr_in clientService;
     clientService.sin_family = AF_INET;
     inet_pton(AF_INET,"127.0.0.1",&clientService.sin_addr.s_addr);
@@ -70,7 +70,7 @@ bool Socket::connectsocket(SOCKET clientSocket, uint16_t port) {
 }
 
 int Socket::sendData(SOCKET connectedSocket,Response msg) {
-    int byteCount = send(connectedSocket,(char*)&msg.getcontent , sizeof(msg), 0);
+    int byteCount = (int)send(connectedSocket,(char*)&msg.getContent() , sizeof(msg), 0);
     if(byteCount==SOCKET_ERROR)
     {
         std::cout<<"send error"<<GETSOCKETERRNO()<<std::endl;

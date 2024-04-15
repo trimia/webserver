@@ -10,6 +10,10 @@ Response::~Response()
 	std::cout << "Response : Destructor Called" << std::endl;
 }
 
+const std::string &Response::getContent() const {
+    return _content;
+}
+
 Response::Response(Response const &obj)
 {
 	std::cout << "Copy Constructor Called" << std::endl;

@@ -24,7 +24,7 @@ class	Socket
         bool listenOnSocket(SOCKET serverSocket);
         bool acceptConnection(SOCKET serverSocket);
         //client side
-        bool connectsocket(SOCKET clientSocket, uint16_t port);
+        bool connectSocket(SOCKET clientSocket, uint16_t port);
         int sendData(SOCKET connectedSocket, Response msg);
         int receiveData(SOCKET acceptedSocket,Request httpRequest);
 
