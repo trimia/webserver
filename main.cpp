@@ -1,30 +1,31 @@
 #include "Client.hpp"
+#include "Server.hpp"
 
 int main(int argc, char** argv)
 {
+
     std::cout<<"bella"<<std::endl;
     /*
      * check arg error
      * check config file ?
-     * call parser to take info from config file
-     * call setup function to start creating server and initialize everything
-     * call run (function with main loop)--- decide if implement a run function or do it at the end of setup()
+     * call parser to take info from config file and create server object to fullfill --> std::vector<Server> listOfServer
+     * call setup function to  initialize everything
+     * call run (function with main loop)---
      * */
+
+    std::vector<Server> listOfServer;
+    //example
+    Server server1;
+    server1.setupServer();
+    listOfServer.push_back(server1);
+    //end
+
+    Server webserver;
+
+    webserver.setup(listOfServer);
+    webserver.run();
+
 
 
 	return (0);
-}
-
-void setup()
-{
-    /*
-     * create server object end fill it with parser data
-     * create client and all is necessary to run the server
-     * if end without error go on on main
-     * */
-}
-// decide if is necessary
-void run(){
-
-    //start main loop
 }

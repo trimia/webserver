@@ -92,9 +92,8 @@ int Socket::receiveData(SOCKET acceptedSocket, Request httpRequest) {
         return SOCKET_ERROR;
     }else
     {
-        std::cout<<"receive data, "<<byteCount<<"byte"<<std::endl;
-        httpRequest.str.append(rcv_buffer,RCV_BUF_SIZE);
-
+        std::cout<<"receive data, "<<byteCount<<" byte"<<std::endl;
+        httpRequest.parseRequest(rcv_buffer,httpRequest);
         return byteCount;
     }
 }
