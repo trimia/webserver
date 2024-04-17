@@ -4,28 +4,28 @@
 #include "include.h"
 #include "Location.hpp"
 #include "Socket.hpp"
+#include "config.hpp"
 
 // ******************************************************** //
 //                         CLASSES                         //
 // ****************************************************** //
-
+class Socket;
 class	Server
 {
 	public	:
-		Server();
+        Server();
 		Server(Server const &obj);
 
-    Server(uint16_t port, in_addr_t host, const std::string &serverName, const std::string &root,
-           unsigned long clientMaxBodySize, const std::string &index, bool autoindex,
-           const std::map<short, std::string> &errorPages, const std::vector<Location> &locations,
-           const sockaddr_in &serverAddress, int fd);
 
+    Server(uint16_t port, char *ip, const std::string &serverName, const std::string &root, const std::string &index,
+           unsigned long clientMaxBodySize, bool autoindex, const std::map<short, std::string> &errorPages,
+           const std::vector<Location> &locations);
 
     ~Server();
 		Server  &operator= (const Server &obj);
         void    run();
-        void    setup(std::vector<Server> listOfServer);
-        void    setupServer();
+        Server    setupServer(config conf);
+        std::vector<Server> setup(std::vector<config> allConf);
 
     uint16_t getPort() const;
 
@@ -71,20 +71,24 @@ class	Server
 
     void setFd(int fd);
 
+    Socket getServerSock() const;
+
 private	:
+        friend class Socket;
 //        std::vector<Server>             _listOfServer;
         uint16_t						_port;
-        in_addr_t						_host;
+        char *                          _ip;
         std::string						_server_name;
         std::string						_root;
-        unsigned long					_client_max_body_size;
         std::string						_index;
+        unsigned long					_client_max_body_size;
         bool							_autoindex;
         std::map<short, std::string>	_error_pages;
         std::vector<Location> 			_locations;
-        struct sockaddr_in 				_server_address;
+//        in_addr_t						_host;
+//        struct sockaddr_in 				_server_address;
         //understand if _socket is necessary or _fd is good maybe have to change socket function return
-        Socket                          _server_sock;
+        Socket                          _server_socket;
         int     						_fd;
 		//	DataType	attributes.
 };

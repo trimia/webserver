@@ -43,7 +43,7 @@ int Request::parseRequest(std::string input, Request httpRequest)
     for (const auto& pair : httpRequest._request_headers) {
         std::cout << pair.first << ": " << pair.second << std::endl;
     }
-
+    return 0;
 }
 
 Request	&Request::operator= (const Request &obj)

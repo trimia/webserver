@@ -1,24 +1,42 @@
 #include "Socket.hpp"
+Socket::Socket() {
+    std::cout << "Socket : Default Constructor Called" << std::endl;
 
-Socket::Socket()
+}
+Socket::Socket(Server server)
 {
-    SOCKET serverSocket = INVALID_SOCKET;
-    serverSocket = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
-    if(serverSocket==INVALID_SOCKET)
+
+    server._server_socket = INVALID_SOCKET;
+    server._server_socket = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
+    if(server._server_socket==INVALID_SOCKET)
     {
         std::cout<<"error in creating socket"<<GETSOCKETERRNO()<<std::endl;
         exit(0);
-    }
-    else
-	    std::cout << "Socket : Default Constructor Called" << std::endl;
+    }else
+        std::cout<<"socket successfully created"<<std::endl;
 }
-//probably we have to adapt the variable of the function to pass server and sockaddr_in
-bool Socket::bindSocket(SOCKET serverSocket,uint16_t port) {
-    sockaddr_in service;
-    service.sin_family=AF_INET;
-//    InetPton() is necesary? find something you can use --> inet_addr() maybe this in servre function
-    service.sin_port= htons(port);
-    if(bind(serverSocket,(sockaddr*)&service, sizeof(service)) == SOCKET_ERROR)
+//void createSocket(Server server)
+//{
+//
+//    server._server_socket = INVALID_SOCKET;
+//    server._server_socket = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
+//    if(server._server_socket==INVALID_SOCKET)
+//    {
+//        std::cout<<"error in creating socket"<<GETSOCKETERRNO()<<std::endl;
+//        exit(0);
+//    }else
+//        std::cout<<"socket successfully created"<<std::endl;
+//}
+/*
+ * probably we have to adapt the variable of the function to pass server and sockaddr_in
+ * if _p== "localhost" fix it with 127.0.0.1
+ */
+bool Socket::bindSocket(Server server) {
+//    sockaddr_in service;
+    server._server_socket->_service.sin_family=AF_INET;
+    server._server_socket->_service.sin_addr.s_addr= inet_addr(server._ip);
+    server._server_socket->_service.sin_port= htons(server._port);
+    if((int)bind(server._server_socket,(sockaddr*)&server._server_socket->_service, sizeof(server._server_socket->_service)) == SOCKET_ERROR)
     {
         std::cout<<"bind failed"<<GETSOCKETERRNO()<<std::endl;
         return (false);

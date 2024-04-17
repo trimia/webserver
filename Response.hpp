@@ -28,7 +28,7 @@ class	Response
 private	:
     //we have to decide what we need here there were 2 example
     //first:
-        Server          _server;
+        Server          *_server;
         std::string     _target_file;
         std::vector<uint8_t> _body;
         size_t          _body_length;

@@ -8,14 +8,6 @@ Server::Server()
 }
 
 
-Server::Server(uint16_t port, in_addr_t host, const std::string &serverName, const std::string &root,
-               unsigned long clientMaxBodySize, const std::string &index, bool autoindex,
-               const std::map<short, std::string> &errorPages, const std::vector<Location> &locations,
-               const sockaddr_in &serverAddress, int fd) : _port(port), _host(host), _server_name(serverName),
-                                                           _root(root), _client_max_body_size(clientMaxBodySize),
-                                                           _index(index), _autoindex(autoindex),
-                                                           _error_pages(errorPages), _locations(locations),
-                                                           _server_address(serverAddress), _fd(fd) {}
 
 Server::~Server()
 {
@@ -47,9 +39,6 @@ uint16_t Server::getPort() const {
     return _port;
 }
 
-in_addr_t Server::getHost() const {
-    return _host;
-}
 
 const std::string &Server::getServerName() const {
     return _server_name;
@@ -79,21 +68,20 @@ const std::vector<Location> &Server::getLocations() const {
     return _locations;
 }
 
-const sockaddr_in &Server::getServerAddress() const {
-    return _server_address;
-}
 
 int Server::getFd() const {
     return _fd;
+}
+
+Socket Server::getServerSock() const {
+    return _server_socket;
 }
 
 void Server::setPort(uint16_t port) {
     _port = port;
 }
 
-void Server::setHost(in_addr_t host) {
-    _host = host;
-}
+
 
 void Server::setServerName(const std::string &serverName) {
     _server_name = serverName;
@@ -123,34 +111,54 @@ void Server::setLocations(const std::vector<Location> &locations) {
     _locations = locations;
 }
 
-void Server::setServerAddress(const sockaddr_in &serverAddress) {
-    _server_address = serverAddress;
-}
 
 void Server::setFd(int fd) {
     _fd = fd;
 }
 
+Server::Server(uint16_t port, char *ip, const std::string &serverName, const std::string &root,
+               const std::string &index, unsigned long clientMaxBodySize, bool autoindex,
+               const std::map<short, std::string> &errorPages, const std::vector<Location> &locations) :
+                                             _port(port), _ip(ip), _server_name(serverName), _root(root), _index(index),
+                                             _client_max_body_size(clientMaxBodySize), _autoindex(autoindex),
+                                             _error_pages(errorPages), _locations(locations){}
+
 /*
  * function
  */
-void    setupServer()
+/*
+ * setup server:
+ *  - call server constructor
+ *  - create a socket per server and bind it
+ */
+Server    setupServer(config conf)
 {
+    Server server(
+            conf.getPort(),conf.getIp(),conf.getServerName(),
+            conf.getRoot(),conf.getIndex(),conf.getClientMaxBodySize(),
+            conf.isAutoindex(),conf.getErrorPages(),conf.getLocations());
+    Socket sock(server);
+    sock.bindSocket(server);
+    return server;
     //build server objetc with parser info
     //    Server server(infobyparser);
-    Socket masterSocket;
-    Server server;
-    masterSocket.bindSocket(server.getFd(),server.getPort());
 }
 
-
-void setup(std::vector<Server> listOfServer)
+/*
+ * setup:
+ */
+std::vector<Server>setup(std::vector<config> allConf)
 {
+    std::vector<Server> listOfServer;
+    listOfServer.reserve(allConf.size());
+for (const auto &item: allConf){
+        listOfServer.push_back(setupServer(item));
+    }
     /*
-     * create server object end fill it with parser data
      * create client and all is necessary to run the server
      * if end without error go on on main
      * */
+
 
     std::cout << std::endl;
 //    Logger::logMsg(LIGHTMAGENTA, CONSOLE_OUTPUT, "Initializing  Servers...");
@@ -168,8 +176,8 @@ void setup(std::vector<Server> listOfServer)
                 serverDub = true;
             }
         }
-        if (!serverDub)
-            it->setupServer();
+//        if (!serverDub)
+//            it->setupServer();
 //        Logger::logMsg(LIGHTMAGENTA, CONSOLE_OUTPUT, "Server Created: ServerName[%s] Host[%s] Port[%d]",it->getServerName().c_str(),inet_ntop(AF_INET, &it->getHost(), buf, INET_ADDRSTRLEN), it->getPort());
     }
 }
