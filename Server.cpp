@@ -182,7 +182,7 @@ void run(){
     fd_set  _write_fd_pool;
     int     select_ret;
 
-    
+
     //start main loop
 //    _biggest_fd = 0;
 //    initializeSets();
