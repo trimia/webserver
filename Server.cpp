@@ -140,7 +140,7 @@ Server    setupServer(config conf)
     Socket sock(server);
     sock.setSocketOption(server);
     sock.bindSocket(server);
-    fcntl(server.getServerSock(),F_SETFL,O_NONBLOCK);
+    fcntl(server.getServerSock().getFdSock(),F_SETFL,O_NONBLOCK);
     return server;
     //build server objetc with parser info
     //    Server server(infobyparser);
@@ -195,7 +195,7 @@ for (const auto &item: allConf){
  *      choose what to do about sock/fd and server/client
  *
  */
-void run(){
+void run_select(){
     fd_set  recv_set_cpy;
     fd_set  write_set_cpy;
     fd_set  _recv_fd_pool;
@@ -244,6 +244,72 @@ void run(){
 //        }
 //        checkTimeout();
 //    }
-
-
 }
+
+void Server::run_epoll() {
+
+    // Step 5. Create an event poll instance.
+    struct epoll_event ev, events[MAX_EVENTS];
+    int epFd = epoll_create(EPOLL_SIZE);
+    auto epoll_events = (struct epoll_event*) malloc(sizeof(struct epoll_event) * EPOLL_SIZE);
+
+    struct epoll_event event;
+    event.events = EPOLLIN;
+    event.data.fd = server_socket;
+
+    // Step 6. Adding the server socket file descriptor to the event poll's control.
+    epoll_ctl(epfd, EPOLL_CTL_ADD, server_socket, &event);
+    int recv_cnt = 0;
+
+    while(true)
+    {
+        // Step 7. Wait until some event happens
+        event_cnt = epoll_wait(epfd, epoll_events, EPOLL_SIZE, -1);
+        if (event_cnt == -1)
+        {
+            puts("epoll_wait() error");
+            break;
+        }
+
+        for (i = 0; i < event_cnt; i++)
+        {
+            if (epoll_events[i].data.fd == server_socket)
+            {
+                addr_size = sizeof(client_addr);
+                client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &addr_size);
+                event.events = EPOLLIN;
+                event.data.fd = client_socket;
+                epoll_ctl(epfd, EPOLL_CTL_ADD, client_socket, &event);
+                //printf("Connected client: %d\n", client_socket);
+            }
+            else  // client socket?
+            {
+                str_len = read(epoll_events[i].data.fd, buf, BUF_SIZE);
+                if (str_len == 0) // close request!
+                {
+                    epoll_ctl(epfd, EPOLL_CTL_DEL, epoll_events[i].data.fd, nullptr);
+                    close(epoll_events[i].data.fd);
+                    printf("%d: %s\n", ++recv_cnt,  buf);
+                    //printf("closed client: %d \n", epoll_events[i].data.fd);
+                }
+                else
+                {
+                    write(epoll_events[i].data.fd, buf, str_len);   // echo!
+                }
+            } // end of else()
+        } // end of for()
+    }  // end of while()
+
+    close(server_socket);
+    close(epfd);
+    free(epoll_events);
+
+    return EXIT_SUCCESS;
+}
+void error_handling(const char *buf)
+{
+    fputs(buf, stderr);
+    fputc('\n', stderr);
+    exit(EXIT_FAILURE);
+}
+

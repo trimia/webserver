@@ -6,9 +6,9 @@ Socket::Socket() {
 Socket::Socket(Server server)
 {
 
-    server._server_socket = INVALID_SOCKET;
-    server._server_socket = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
-    if(server._server_socket==INVALID_SOCKET)
+    server._server_socket._fd_sock = INVALID_SOCKET;
+    server._server_socket._fd_sock = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
+    if(server._server_socket._fd_sock==INVALID_SOCKET)
     {
         std::cout<<"error in creating socket"<<GETSOCKETERRNO()<<std::endl;
         exit(0);
@@ -22,7 +22,7 @@ Socket::Socket(Server server)
 bool Socket::setSocketOption(Server server) {
     int optval = 1;
     //understand if the cast to char is necessary!!
-    if (setsockopt(server._server_socket, SOL_SOCKET, SO_REUSEADDR, (char *) &optval, sizeof(optval)) ==
+    if (setsockopt(server._server_socket._fd_sock, SOL_SOCKET, SO_REUSEADDR, (char *) &optval, sizeof(optval)) ==
         SOCKET_ERROR) {
         std::cout << "cannot set socket option" << GETSOCKETERRNO() << std::endl;
         return false;
@@ -30,7 +30,9 @@ bool Socket::setSocketOption(Server server) {
         return true;
 }
 
-
+int Socket::getFdSock() const {
+    return _fd_sock;
+}
 //void createSocket(Server server)
 //{
 //
@@ -50,9 +52,10 @@ bool Socket::setSocketOption(Server server) {
 bool Socket::bindSocket(Server server) {
 //    sockaddr_in service;
     server._server_socket->_service.sin_family=AF_INET;
+    //inet_addr or htonl
     server._server_socket->_service.sin_addr.s_addr= inet_addr(server._ip);
     server._server_socket->_service.sin_port= htons(server._port);
-    if((int)bind(server._server_socket,(sockaddr*)&server._server_socket->_service, sizeof(server._server_socket->_service)) == SOCKET_ERROR)
+    if((int)bind(server._server_socket._fd_sock,(sockaddr*)&server._server_socket->_service, sizeof(server._server_socket->_service)) == SOCKET_ERROR)
     {
         std::cout<<"bind failed"<<GETSOCKETERRNO()<<std::endl;
         return (false);
@@ -154,3 +157,12 @@ Socket	&Socket::operator= (const Socket &obj)
 	}
 	return (*this);
 }
+
+
+//epoll try
+#define BUF_SIZE 100
+#define EPOLL_SIZE 200
+void error_handling(const char *buf);
+
+
+

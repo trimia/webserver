@@ -15,15 +15,15 @@ int main(int argc, char** argv)
 
     std::vector<Server> listOfServer;
     //example
-    Server server1;
-    server1.setupServer();
-    listOfServer.push_back(server1);
-    //end
-
-    Server webserver;
-
-    webserver.setup(listOfServer);
-    webserver.run();
+//    Server server1;
+//    server1.setupServer();
+//    listOfServer.push_back(server1);
+//    //end
+//
+//    Server webserver;
+//
+//    webserver.setup(listOfServer);
+//    webserver.run();
 
 
 

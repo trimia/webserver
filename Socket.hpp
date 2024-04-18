@@ -32,8 +32,11 @@ class	Socket
         int sendData(SOCKET connectedSocket, Response msg);
         int receiveData(SOCKET acceptedSocket,Request httpRequest);
 
-	private	:
+    int getFdSock() const;
+
+private	:
         Server          *_server;
+        SOCKET          _fd_sock;
         sockaddr_in     _service;
 
     //	DataType	attributes.

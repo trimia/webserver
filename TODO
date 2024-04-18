@@ -12,7 +12,9 @@ multiplexing:
     - poll() or select():
                             - https://mecha-mind.medium.com/a-non-threaded-chat-server-in-c-53dadab8e8f3
                             - https://www.ibm.com/docs/en/i/7.4?topic=designs-using-poll-instead-select
-                            -
+                            - https://hechao.li/2022/01/04/select-vs-poll-vs-epoll/
+                            - https://stackoverflow.com/questions/17355593/why-is-epoll-faster-than-select
+                            - https://devarea.com/linux-io-multiplexing-select-vs-poll-vs-epoll/
 workflow:
     - parser config file: acquire information from config file or if there isn't take the default and initialize struct and class
     - "socket" server client run? file: organize all concern about server and client think to keep alive

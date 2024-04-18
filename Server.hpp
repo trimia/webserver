@@ -23,7 +23,8 @@ class	Server
 
     ~Server();
 		Server  &operator= (const Server &obj);
-        void    run();
+        void    run_select();
+        void    run_epoll();
         Server    setupServer(config conf);
         std::vector<Server> setup(std::vector<config> allConf);
 
