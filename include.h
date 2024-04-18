@@ -42,6 +42,7 @@
 # include <netinet/in.h>
 # include <sys/select.h>
 # include <arpa/inet.h>
+#include  <fcntl.h>
 
 # define GETSOCKETERRNO() (errno)
 # define ISVALIDSOCKET(s) ((s) >= 0)

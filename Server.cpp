@@ -138,7 +138,9 @@ Server    setupServer(config conf)
             conf.getRoot(),conf.getIndex(),conf.getClientMaxBodySize(),
             conf.isAutoindex(),conf.getErrorPages(),conf.getLocations());
     Socket sock(server);
+    sock.setSocketOption(server);
     sock.bindSocket(server);
+    fcntl(server.getServerSock(),F_SETFL,O_NONBLOCK);
     return server;
     //build server objetc with parser info
     //    Server server(infobyparser);
@@ -149,15 +151,19 @@ Server    setupServer(config conf)
  */
 std::vector<Server>setup(std::vector<config> allConf)
 {
+
+/*
+ * create client and all is necessary to run the server
+ * maybe both client and server go on the same list ???
+ * if end without error go on on main
+ */
     std::vector<Server> listOfServer;
     listOfServer.reserve(allConf.size());
 for (const auto &item: allConf){
         listOfServer.push_back(setupServer(item));
     }
-    /*
-     * create client and all is necessary to run the server
-     * if end without error go on on main
-     * */
+    return listOfServer;
+
 
 
     std::cout << std::endl;
@@ -182,7 +188,13 @@ for (const auto &item: allConf){
     }
 }
 
-
+/*
+ * run:
+ * set al necessary for the select()
+ * start the main loop:
+ *      choose what to do about sock/fd and server/client
+ *
+ */
 void run(){
     fd_set  recv_set_cpy;
     fd_set  write_set_cpy;

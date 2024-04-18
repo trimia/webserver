@@ -15,6 +15,22 @@ Socket::Socket(Server server)
     }else
         std::cout<<"socket successfully created"<<std::endl;
 }
+/*
+ * setsocketoption:
+ * choose what option socket hav to do: keepalive etc... see the link in TODO for differnt option
+ */
+bool Socket::setSocketOption(Server server) {
+    int optval = 1;
+    //understand if the cast to char is necessary!!
+    if (setsockopt(server._server_socket, SOL_SOCKET, SO_REUSEADDR, (char *) &optval, sizeof(optval)) ==
+        SOCKET_ERROR) {
+        std::cout << "cannot set socket option" << GETSOCKETERRNO() << std::endl;
+        return false;
+    } else
+        return true;
+}
+
+
 //void createSocket(Server server)
 //{
 //

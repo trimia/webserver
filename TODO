@@ -1,4 +1,9 @@
-- socket explanation video part 1 and 2 https://www.youtube.com/watch?v=gntyAFoZp-E
+example adn guide:
+    - https://teoriadeisegnali.it/appint/html/altro/bgnet/index.html
+socket:
+    - socket  setsockopt() necessary to keep alive https://www.ibm.com/docs/en/zos/2.4.0?topic=calls-setsockopt https://www.ibm.com/docs/en/aix/7.2?topic=s-setsockopt-subroutine
+    - socket explanation video part 1 and 2 https://www.youtube.com/watch?v=gntyAFoZp-E
+
 multiplexing:
     - if we want to use select() :
                                     - https://codereview.stackexchange.com/questions/111310/select-server-implementation
