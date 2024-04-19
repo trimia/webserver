@@ -249,31 +249,34 @@ void run_select(){
 void Server::run_epoll() {
 
     // Step 5. Create an event poll instance.
-    struct epoll_event ev, events[MAX_EVENTS];
+    // MAX_EVENT AND EPOLL_SIZE maybe they could be defined every time after parsing so maybe became part of a struct or class no more a macro
+    struct epoll_event event, epoll_events[MAX_EVENTS];
     int epFd = epoll_create(EPOLL_SIZE);
-    auto epoll_events = (struct epoll_event*) malloc(sizeof(struct epoll_event) * EPOLL_SIZE);
+    SOCKET event_cnt;
+// understand if is necessary to allocate event
+//    auto epoll_events = (struct epoll_event*) malloc(sizeof(struct epoll_event) * EPOLL_SIZE);
+//    struct epoll_event event;
 
-    struct epoll_event event;
     event.events = EPOLLIN;
-    event.data.fd = server_socket;
+    event.data.fd = this->_server_socket.getFdSock();
 
     // Step 6. Adding the server socket file descriptor to the event poll's control.
-    epoll_ctl(epfd, EPOLL_CTL_ADD, server_socket, &event);
+    epoll_ctl(epFd, EPOLL_CTL_ADD, this->_server_socket.getFdSock(), &event);
     int recv_cnt = 0;
 
     while(true)
     {
         // Step 7. Wait until some event happens
-        event_cnt = epoll_wait(epfd, epoll_events, EPOLL_SIZE, -1);
-        if (event_cnt == -1)
+        event_cnt = epoll_wait(epFd, epoll_events, EPOLL_SIZE, -1);
+        if (event_cnt == SOCKET_ERROR)
         {
-            puts("epoll_wait() error");
+            std::cout<<"epoll_wait error"<<std::endl;
             break;
         }
 
-        for (i = 0; i < event_cnt; i++)
+        for (int i = 0; i < event_cnt; ++i)
         {
-            if (epoll_events[i].data.fd == server_socket)
+            if (epoll_events[i].data.fd == this->_server_socket.getFdSock())
             {
                 addr_size = sizeof(client_addr);
                 client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &addr_size);
