@@ -246,22 +246,30 @@ void run_select(){
 //    }
 }
 
-void Server::run_epoll() {
+void Server::run_epoll(std::vector<Server> listOfServer) {
 
     // Step 5. Create an event poll instance.
     // MAX_EVENT AND EPOLL_SIZE maybe they could be defined every time after parsing so maybe became part of a struct or class no more a macro
     struct epoll_event event, epoll_events[MAX_EVENTS];
     int epFd = epoll_create(EPOLL_SIZE);
     SOCKET event_cnt;
+//    struct epoll_event event;
+    for (const auto &item: listOfServer)
+    {
+        event.epoll_events = EPOLLIN | EPOLLET;
+        event.data.fd = item._server_socket.getFdSock();
+        if(epoll_ctl(epFd, EPOLL_CTL_ADD, item._server_socket.getFdSock(), &event)==-1)
+        {
+            std::cout<<"epol_ctl failed to add fd-sock to epoll instance"<<std::endl;
+            //exit or something to error handling
+        }
+    }
+    
+    
 // understand if is necessary to allocate event
 //    auto epoll_events = (struct epoll_event*) malloc(sizeof(struct epoll_event) * EPOLL_SIZE);
-//    struct epoll_event event;
-
-    event.events = EPOLLIN;
-    event.data.fd = this->_server_socket.getFdSock();
 
     // Step 6. Adding the server socket file descriptor to the event poll's control.
-    epoll_ctl(epFd, EPOLL_CTL_ADD, this->_server_socket.getFdSock(), &event);
     int recv_cnt = 0;
 
     while(true)
