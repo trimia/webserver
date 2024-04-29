@@ -266,16 +266,19 @@ bool Server::_handleEpollEvents(int eventNumber, epoll_event (&events)[MAX_EVENT
                 return false;
         }
         else if(events[i].events && EPOLLIN | events[i].events && EPOLLOUT)
-            _handleConnection(events,eventNumber);
+            _handleEpollin();
+//            _handleConnection(events,eventNumber);
+        else if ( events[i].events && EPOLLOUT)
+                _handleEpollout();
 
     }
-
     return true;
 }
 /*
  * handleConnection:
  * check what to do with connection and
  * call read()? or receiveData() write() or sendData() -see the snippet code in the function-,request, response and parser
+ * TODO study and complete _handleconnection understand how we want handle response request etc..
  */
 bool Server::_handleConnection(epoll_event (&events)[MAX_EVENTS],int i) {
 
@@ -292,6 +295,8 @@ bool Server::_handleConnection(epoll_event (&events)[MAX_EVENTS],int i) {
     {
         write(events[i].data.fd, buf, str_len);   // echo!
     }
+
+//    client.peaksize = recv(client.connection_socket.sock_fd, buffer, MAX_HEADER_SIZE, MSG_PEEK);
 
     return false;
 }
