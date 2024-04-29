@@ -53,8 +53,11 @@
 # define RCV_BUF_SIZE 8000
 # define MAX_N_CONNECTION 5
 // MAX_EVENT AND EPOLL_SIZE maybe they could be defined every time after parsing so maybe became part of a struct or class no more a macro
-# define MAX_EVENTS 200
-# define EPOLL_SIZE 1000
+# define MAX_EVENTS 1024
+# define EPOLL_TIMEOUT 2000
+# define SERVER_SOCK 1
+# define CLIENT_SCOK 2
+//# define EPOLL_SIZE 1000
 # define BUFFER 40000
 # define RED		"\033[0;31m"
 # define GREEN		"\033[0;32m"

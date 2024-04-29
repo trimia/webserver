@@ -24,7 +24,7 @@ class	Server
     ~Server();
 		Server  &operator= (const Server &obj);
         void    run_select();
-        void    run_epoll();
+        void    run_epoll(std::vector<Server> listOfServer);
         Server    setupServer(config conf);
         std::vector<Server> setup(std::vector<config> allConf);
 
@@ -74,6 +74,7 @@ class	Server
 
     Socket getServerSock() const;
 
+
 private	:
         friend class Socket;
 //        std::vector<Server>             _listOfServer;
@@ -91,6 +92,14 @@ private	:
         //understand if _socket is necessary or _fd is good maybe have to change socket function return
         Socket                          _server_socket;
         int     						_fd;
+        int                             _epollFd;
+        int                             _type;
+        epoll_event                     _event;
+        bool _initEpoll();
+        bool _addServerToEpoll(std::vector<Server> listofserver);
+        bool _mainLoop();
+        bool _handleEpollEvents(int eventNumber, epoll_event (&events)[MAX_EVENTS]);
+        bool _handleConnection(epoll_event (&events)[MAX_EVENTS], int i);
 		//	DataType	attributes.
 };
 

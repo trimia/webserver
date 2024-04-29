@@ -78,14 +78,21 @@ bool Socket::listenOnSocket(SOCKET serverSocket) {
     }
 }
 
-bool Socket::acceptConnection(SOCKET serverSocket) {
-    SOCKET acceptSocket;
-    acceptSocket= accept(serverSocket,NULL,NULL);
-    if(acceptSocket==INVALID_SOCKET)
+bool Socket::acceptConnection(Server *server) {
+//    SOCKET acceptSocket;
+//    acceptSocket= accept(server._fd,server._server_socket._service, sizeof(server._server_socket._service));
+//    if(acceptSocket==INVALID_SOCKET)
+    if(accept(server->_fd,server->_server_socket._service, sizeof(server->_server_socket._service))==INVALID_SOCKET)
     {
         std::cout<<"accepted failed"<<GETSOCKETERRNO()<<std::endl;
         return false;
     }
+    if(epoll_ctl(server->_epollFd,EPOLL_CTL_ADD, server->_server_socket.getFdSock(), &server->_event)<1)
+        return false;
+    server->_event.events=EPOLLIN | EPOLLOUT;
+    server->_event.data.ptr=&server;
+    server->_type=CLIENT_SCOK;
+    std::cout<<"client sock added to epoll instance"<<std::endl;
     return true;
 }
 

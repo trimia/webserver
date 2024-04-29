@@ -26,7 +26,7 @@ class	Socket
         //think about pass socket to function or the object server;
         bool bindSocket(Server server); //maybe the port is not necessary -> getport
         bool listenOnSocket(SOCKET serverSocket);
-        bool acceptConnection(SOCKET serverSocket);
+        bool acceptConnection(Server *server);
         //client side
         bool connectSocket(SOCKET clientSocket, uint16_t port);
         int sendData(SOCKET connectedSocket, Response msg);
@@ -38,6 +38,7 @@ private	:
         Server          *_server;
         SOCKET          _fd_sock;
         sockaddr_in     _service;
+//        socklen_t       _socksize;
 
     //	DataType	attributes.
 };

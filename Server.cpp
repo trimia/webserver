@@ -129,7 +129,7 @@ Server::Server(uint16_t port, char *ip, const std::string &serverName, const std
 /*
  * setup server:
  *  - call server constructor
- *  - create a socket per server and bind it
+ *  - create a socket per server, bind it and set it as non-blocking
  */
 Server    setupServer(config conf)
 {
@@ -163,29 +163,6 @@ for (const auto &item: allConf){
         listOfServer.push_back(setupServer(item));
     }
     return listOfServer;
-
-
-
-    std::cout << std::endl;
-//    Logger::logMsg(LIGHTMAGENTA, CONSOLE_OUTPUT, "Initializing  Servers...");
-//    _servers = servers;
-    char buf[INET_ADDRSTRLEN];
-    bool    serverDub;
-    for (std::vector<Server>::iterator it = listOfServer.begin(); it != listOfServer.end(); ++it)
-    {
-        serverDub = false;
-        for (std::vector<Server>::iterator it1 = listOfServer.begin(); it1 != it; ++it1)
-        {
-            if (it1->getHost() == it->getHost() && it1->getPort() == it->getPort())
-            {
-                it->setFd(it1->getFd());
-                serverDub = true;
-            }
-        }
-//        if (!serverDub)
-//            it->setupServer();
-//        Logger::logMsg(LIGHTMAGENTA, CONSOLE_OUTPUT, "Server Created: ServerName[%s] Host[%s] Port[%d]",it->getServerName().c_str(),inet_ntop(AF_INET, &it->getHost(), buf, INET_ADDRSTRLEN), it->getPort());
-    }
 }
 
 /*
@@ -246,73 +223,87 @@ void run_select(){
 //    }
 }
 
-void Server::run_epoll() {
+bool Server::_initEpoll() {
+    this->_epollFd = epoll_create1(EPOLL_CLOEXEC);
+    if (this->_epollFd<0)
+        return true;
+    std::cout<<"epoll created"<<std::endl;
+    return false;
+}
 
-    // Step 5. Create an event poll instance.
-    // MAX_EVENT AND EPOLL_SIZE maybe they could be defined every time after parsing so maybe became part of a struct or class no more a macro
-    struct epoll_event event, epoll_events[MAX_EVENTS];
-    int epFd = epoll_create(EPOLL_SIZE);
-    SOCKET event_cnt;
+bool Server::_addServerToEpoll(std::vector<Server> listOfServer) {
+
+    for (Server &item: listOfServer){
+        if(epoll_ctl(item._epollFd,EPOLL_CTL_ADD, item._server_socket.getFdSock(), &item._event)<1)
+            return false;
+        item._event.events=EPOLLIN;
+        item._event.data.ptr=&item;
+        item._type=SERVER_SOCK;
+
+    }
+    std::cout<<"all server sock added to epoll instance"<<std::endl;
+    return true;
+}
+
+bool Server::_mainLoop() {
+    int eventNumber;
+    epoll_event events[MAX_EVENTS];
+    do{
+        eventNumber= epoll_wait(this->_epollFd,events,MAX_EVENTS,EPOLL_TIMEOUT);
+        if(eventNumber>0)
+            _handleEpollEvents(eventNumber,events);
+
+    } while (eventNumber<=0);
+    return false;
+}
+
+bool Server::_handleEpollEvents(int eventNumber, epoll_event (&events)[MAX_EVENTS]) {
+    for (int i = 0; i < eventNumber; ++i)
+    {
+        Server	*ptr = static_cast<Server *>(events[i].data.ptr);
+        if(ptr->_type==SERVER_SOCK){
+            if(ptr->_server_socket.acceptConnection(ptr))
+                return false;
+        }
+        else if(events[i].events && EPOLLIN | events[i].events && EPOLLOUT)
+            _handleConnection(events,eventNumber);
+
+    }
+
+    return true;
+}
+/*
+ * handleConnection:
+ * check what to do with connection and
+ * call read()? or receiveData() write() or sendData() -see the snippet code in the function-,request, response and parser
+ */
+bool Server::_handleConnection(epoll_event (&events)[MAX_EVENTS],int i) {
+
+    int str_len;
+    void *buf;
+    str_len = read(events[i].data.fd, buf, BUFFER_SIZE);
+    if (str_len == 0) // close request!
+    {
+        epoll_ctl(this->_epollFd, EPOLL_CTL_DEL, events[i].data.fd, nullptr);
+        close(events[i].data.fd);
+        //printf("closed client: %d \n", epoll_events[i].data.fd);
+    }
+    else
+    {
+        write(events[i].data.fd, buf, str_len);   // echo!
+    }
+
+    return false;
+}
+
+void Server::run_epoll(std::vector<Server> listOfServer) {
+
+    this->_initEpoll();
+    this->_addServerToEpoll(listOfServer);
+    this->_mainLoop();
+
 // understand if is necessary to allocate event
 //    auto epoll_events = (struct epoll_event*) malloc(sizeof(struct epoll_event) * EPOLL_SIZE);
 //    struct epoll_event event;
-
-    event.events = EPOLLIN;
-    event.data.fd = this->_server_socket.getFdSock();
-
-    // Step 6. Adding the server socket file descriptor to the event poll's control.
-    epoll_ctl(epFd, EPOLL_CTL_ADD, this->_server_socket.getFdSock(), &event);
-    int recv_cnt = 0;
-
-    while(true)
-    {
-        // Step 7. Wait until some event happens
-        event_cnt = epoll_wait(epFd, epoll_events, EPOLL_SIZE, -1);
-        if (event_cnt == SOCKET_ERROR)
-        {
-            std::cout<<"epoll_wait error"<<std::endl;
-            break;
-        }
-
-        for (int i = 0; i < event_cnt; ++i)
-        {
-            if (epoll_events[i].data.fd == this->_server_socket.getFdSock())
-            {
-                addr_size = sizeof(client_addr);
-                client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &addr_size);
-                event.events = EPOLLIN;
-                event.data.fd = client_socket;
-                epoll_ctl(epfd, EPOLL_CTL_ADD, client_socket, &event);
-                //printf("Connected client: %d\n", client_socket);
-            }
-            else  // client socket?
-            {
-                str_len = read(epoll_events[i].data.fd, buf, BUF_SIZE);
-                if (str_len == 0) // close request!
-                {
-                    epoll_ctl(epfd, EPOLL_CTL_DEL, epoll_events[i].data.fd, nullptr);
-                    close(epoll_events[i].data.fd);
-                    printf("%d: %s\n", ++recv_cnt,  buf);
-                    //printf("closed client: %d \n", epoll_events[i].data.fd);
-                }
-                else
-                {
-                    write(epoll_events[i].data.fd, buf, str_len);   // echo!
-                }
-            } // end of else()
-        } // end of for()
-    }  // end of while()
-
-    close(server_socket);
-    close(epfd);
-    free(epoll_events);
-
-    return EXIT_SUCCESS;
-}
-void error_handling(const char *buf)
-{
-    fputs(buf, stderr);
-    fputc('\n', stderr);
-    exit(EXIT_FAILURE);
 }
 
