@@ -8,8 +8,8 @@
 // ******************************************************** //
 //                         CLASSES                         //
 // ****************************************************** //
-class Server;
 class Client;
+class Server;
 class	Webserver
 {
 	public	:
@@ -17,6 +17,8 @@ class	Webserver
 		Webserver (Webserver const &obj);
 		~Webserver ();
 		Webserver &operator= (const Webserver &obj);
+
+    void addClientToList(Client client);
 
     const std::vector<Server> &getListOfServer() const;
 
@@ -30,10 +32,18 @@ class	Webserver
 
     void setEpollFd(int epollFd);
 
+    void run_epoll();
+
 private	:
-        std::vector<Server>     _listOfServer;
-        std::vector<Client>     _listOfClient;
-        int                     _epoll_fd;
+
+    std::vector<Server>     _listOfServer;
+    std::vector<Client>     _listOfClient;
+    int                     _epollFd;
+    bool _initEpoll();
+    bool _addServerToEpoll();
+    bool _mainLoop();
+    bool _handleEpollEvents(int eventNumber, epoll_event (&events)[MAX_EVENTS]);
+    bool _handleConnection(epoll_event (&events)[MAX_EVENTS], int i);
 
 		//	DataType	attributes.
 };

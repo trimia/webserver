@@ -4,13 +4,18 @@
 #include "include.h"
 #include "Response.hpp"
 #include "Request.hpp"
+#include "Webserver.hpp"
+#include "Server.hpp"
+
 
 // ******************************************************** //
 //                         CLASSES                         //
 // ****************************************************** //
 class Response;
 class Request;
+class Webserver;
 class Server;
+
 class	Socket
 {
 	public	:
@@ -26,7 +31,7 @@ class	Socket
         //think about pass socket to function or the object server;
         bool bindSocket(Server server); //maybe the port is not necessary -> getport
         bool listenOnSocket(SOCKET serverSocket);
-        bool acceptConnection(Server *server);
+        bool acceptConnection(Server *server, int epollFd,Webserver *webserver);
         //client side
         bool connectSocket(SOCKET clientSocket, uint16_t port);
         int sendData(SOCKET connectedSocket, Response msg);
@@ -35,8 +40,9 @@ class	Socket
     int getFdSock() const;
 
 private	:
-        Server          *_server;
-        SOCKET          _fd_sock;
+    //is necessary a pointer to server??
+//        Server          *_server;
+        int          _fd_sock;
         sockaddr_in     _service;
 //        socklen_t       _socksize;
 

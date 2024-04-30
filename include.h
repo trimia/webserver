@@ -1,7 +1,6 @@
 #pragma once
 #ifndef INCLUDE_H
 # define INCLUDE_H
-
 # include <iostream>
 // # include <fstream>
 # include <fcntl.h>
@@ -44,6 +43,9 @@
 # include <sys/epoll.h>
 # include <arpa/inet.h>
 # include <fcntl.h>
+
+# include "Type.h"
+//# include "Socket.hpp"
 
 # define GETSOCKETERRNO() (errno)
 # define ISVALIDSOCKET(s) ((s) >= 0)

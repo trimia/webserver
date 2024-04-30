@@ -47,9 +47,9 @@ class	Request
         std::map<std::string, std::string>		_requestHeaders;
 
         std::string                         _path;
-        //maybe insted of string string we can do httmethod string or maybe isn't necessary a map
+//        //maybe insted of string string we can do httmethod string or maybe isn't necessary a map
         std::map<std::string, std::string>  _request_headers;
-        HttpMethod                          _method;
+//        HttpMethod                          _method;
         std::string                         _body;
         size_t                              _max_body_size;
         size_t                              _body_length;

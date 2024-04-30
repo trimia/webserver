@@ -5,6 +5,8 @@ Client::Client()
 	std::cout << "Client : Default Constructor Called" << std::endl;
 }
 
+Client::Client(int id, int fd) : _id(id), _fd(fd) {}
+
 Client::~Client()
 {
 	std::cout << "Client : Destructor Called" << std::endl;

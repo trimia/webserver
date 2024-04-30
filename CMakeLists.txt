@@ -25,4 +25,6 @@ add_executable(webserver
         Location.cpp
         Location.hpp
         Webserver.hpp
-        Webserver.cpp)
+        Webserver.cpp
+        Type.cpp
+        Type.h)

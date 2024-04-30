@@ -1,32 +1,43 @@
 #ifndef _Client_HPP_
 #define _Client_HPP_
 
-#include "include.h"
 #include "Socket.hpp"
+#include "include.h"
 #include "Request.hpp"
 #include "Response.hpp"
 
 // ******************************************************** //
 //                         CLASSES                         //
 // ****************************************************** //
-
-class	Client
+class Socket;
+class Server;
+class Response;
+class Request;
+class	Client //: public Type
 {
 	public	:
 		Client ();
 		Client (Client const &obj);
-		~Client ();
+
+    Client(int id, int fd);
+
+    ~Client ();
 		Client &operator= (const Client &obj);
 
 	private	:
+        friend class Socket;
 
 
 
         int             _id;
-        Socket			_clientSock;
+        int             _fd;
+//        Socket			_clientSock;
         Server          *_server;
         Request		    *_request;
         Response        *_response;
+        epoll_event     _event;
+        int             _type;
+
 
         int				_method;
         bool			_isFirstLine;

@@ -15,6 +15,33 @@ Socket::Socket(Server server)
     }else
         std::cout<<"socket successfully created"<<std::endl;
 }
+Socket::~Socket()
+{
+    std::cout << "Socket : Destructor Called" << std::endl;
+}
+
+Socket::Socket(Socket const &obj)
+{
+    std::cout << "Copy Constructor Called" << std::endl;
+    if (this != &obj)
+        *this = obj;
+}
+
+Socket	&Socket::operator= (const Socket &obj)
+{
+    std::cout << "Copy Assignment Operator Called" << std::endl;
+    if (this != &obj)
+    {
+        this->_fd_sock=obj._fd_sock;
+        this->_service=obj._service;
+
+
+        //	this->attributes = obj.attributes;
+        //	...
+    }
+    return (*this);
+}
+
 /*
  * setsocketoption:
  * choose what option socket hav to do: keepalive etc... see the link in TODO for differnt option
@@ -78,20 +105,28 @@ bool Socket::listenOnSocket(SOCKET serverSocket) {
     }
 }
 
-bool Socket::acceptConnection(Server *server) {
+bool Socket::acceptConnection(Server *server, int epollFd, Webserver *webserver) {
 //    SOCKET acceptSocket;
 //    acceptSocket= accept(server._fd,server._server_socket._service, sizeof(server._server_socket._service));
 //    if(acceptSocket==INVALID_SOCKET)
-    if(accept(server->_fd,server->_server_socket._service, sizeof(server->_server_socket._service))==INVALID_SOCKET)
+    Client client;
+
+    if((client._fd=accept(server->_fd,server->_server_socket._service, sizeof(server->_server_socket._service)))==INVALID_SOCKET)
     {
         std::cout<<"accepted failed"<<GETSOCKETERRNO()<<std::endl;
         return false;
     }
-    if(epoll_ctl(server->_epollFd,EPOLL_CTL_ADD, server->_server_socket.getFdSock(), &server->_event)<1)
-        return false;
-    server->_event.events=EPOLLIN | EPOLLOUT;
-    server->_event.data.ptr=&server;
-    server->_type=CLIENT_SCOK;
+    client._event.events=EPOLLIN | EPOLLOUT;
+    client._event.data.ptr=&client;
+    client._type=CLIENT_SCOK;
+    webserver->addClientToList(client);
+
+//    server->_event.events=EPOLLIN | EPOLLOUT;
+//    server->_event.data.ptr=&server;
+//    server->_type=CLIENT_SCOK;
+//    if(epoll_ctl(epollFd,EPOLL_CTL_ADD, server->_server_socket.getFdSock(), &server->_event)<1)
+    if(epoll_ctl(epollFd,EPOLL_CTL_ADD, client._fd, &client._event)<1)
+            return false;
     std::cout<<"client sock added to epoll instance"<<std::endl;
     return true;
 }
@@ -113,7 +148,7 @@ bool Socket::connectSocket(SOCKET clientSocket, uint16_t port) {
     }
 }
 
-int Socket::sendData(SOCKET connectedSocket,Response msg) {
+int Socket::sendData(SOCKET connectedSocket, Response msg) {
     int byteCount = (int)send(connectedSocket,(char*)&msg.getContent() , sizeof(msg), 0);
     if(byteCount==SOCKET_ERROR)
     {
@@ -141,35 +176,4 @@ int Socket::receiveData(SOCKET acceptedSocket, Request httpRequest) {
         return byteCount;
     }
 }
-
-Socket::~Socket()
-{
-	std::cout << "Socket : Destructor Called" << std::endl;
-}
-
-Socket::Socket(Socket const &obj)
-{
-	std::cout << "Copy Constructor Called" << std::endl;
-	if (this != &obj)
-		*this = obj;
-}
-
-Socket	&Socket::operator= (const Socket &obj)
-{
-	std::cout << "Copy Assignment Operator Called" << std::endl;
-	if (this != &obj)
-	{
-		//	this->attributes = obj.attributes;
-		//	...
-	}
-	return (*this);
-}
-
-
-//epoll try
-#define BUF_SIZE 100
-#define EPOLL_SIZE 200
-void error_handling(const char *buf);
-
-
 
