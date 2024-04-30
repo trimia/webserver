@@ -260,16 +260,13 @@ bool Server::_mainLoop() {
 bool Server::_handleEpollEvents(int eventNumber, epoll_event (&events)[MAX_EVENTS]) {
     for (int i = 0; i < eventNumber; ++i)
     {
-        Server	*ptr = static_cast<Server *>(events[i].data.ptr);
+        auto 	*ptr = static_cast<Server *>(events[i].data.ptr);
         if(ptr->_type==SERVER_SOCK){
             if(ptr->_server_socket.acceptConnection(ptr))
                 return false;
         }
         else if(events[i].events && EPOLLIN | events[i].events && EPOLLOUT)
-            _handleEpollin();
-//            _handleConnection(events,eventNumber);
-        else if ( events[i].events && EPOLLOUT)
-                _handleEpollout();
+            _handleConnection(events,eventNumber);
 
     }
     return true;
@@ -281,6 +278,12 @@ bool Server::_handleEpollEvents(int eventNumber, epoll_event (&events)[MAX_EVENT
  * TODO study and complete _handleconnection understand how we want handle response request etc..
  */
 bool Server::_handleConnection(epoll_event (&events)[MAX_EVENTS],int i) {
+
+    if (EPOLLIN)
+    {
+
+    }
+
 
     int str_len;
     void *buf;

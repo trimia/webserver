@@ -22,6 +22,8 @@ Client	&Client::operator= (const Client &obj)
 	std::cout << "Copy Assignment Operator Called" << std::endl;
 	if (this != &obj)
 	{
+        this->_id=obj._id;
+//        this->_server=obj;
 		//	this->attributes = obj.attributes;
 		//	...
 	}

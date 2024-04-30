@@ -29,6 +29,23 @@ class	Request
     void setRequestHeaders(const std::map<std::string, std::string> &requestHeaders);
 
     private	:
+
+        bool									_parsed;
+        bool									_is_cgi;
+        std::string								_httpMessage; // messaggio intero preso a pezzi
+        bool									_complete; // finito di leggere o serve un altro giro
+        bool									_answered;
+        std::string								_method; // GET, POST, DELETE //! GET
+        std::string								_requestURL; // tutta la url //! /www/html/index.html?ciao=asd/bella=zi
+        std::string								_path_file; // la url senza query //! /www/html/index.html
+        std::vector<std::string>				_folders; // le cartelle del URL //! www html
+        std::string								_fileName; // solo il file nella URL //! index.html
+        std::string								_extension; // estensione del file se esiste //! html
+        std::string								_queryName; // le query, dopo il '?' nella URL //! ciao=asd/bella=zi
+        std::map<std::string, std::string>		_queryMap; // querry divisa per: chiave=valore&... //! ciao[asd] bella[zi]
+        std::string								_version; // HTTP1.1
+        std::map<std::string, std::string>		_requestHeaders;
+
         std::string                         _path;
         //maybe insted of string string we can do httmethod string or maybe isn't necessary a map
         std::map<std::string, std::string>  _request_headers;

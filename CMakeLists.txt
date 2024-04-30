@@ -23,4 +23,6 @@ add_executable(webserver
         Socket.cpp
         Socket.hpp
         Location.cpp
-        Location.hpp)
+        Location.hpp
+        Webserver.hpp
+        Webserver.cpp)
