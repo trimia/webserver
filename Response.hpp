@@ -2,8 +2,8 @@
 #define _Response_HPP_
 
 #include "include.h"
-#include "Request.hpp"
-#include "Server.hpp"
+//#include "Request.hpp"
+//#include "Server.hpp"
 
 // ******************************************************** //
 //                         CLASSES                         //
@@ -14,7 +14,7 @@ enum e_resource_type
     RT_DIR
 };
 class Request;
-class Server;
+//class Server;
 class	Response
 {
 	public	:
@@ -28,7 +28,7 @@ class	Response
 private	:
     //we have to decide what we need here there were 2 example
     //first:
-        Server          *_server;
+//        Server          *_server;
         std::string     _target_file;
         std::vector<uint8_t> _body;
         size_t          _body_length;

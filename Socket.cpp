@@ -1,20 +1,11 @@
 #include "Socket.hpp"
 Socket::Socket() {
+    this->_fd_sock=INVALID_SOCKET;
+//    this->_service
     std::cout << "Socket : Default Constructor Called" << std::endl;
 
 }
-Socket::Socket(Server server)
-{
 
-    server._server_socket._fd_sock = INVALID_SOCKET;
-    server._server_socket._fd_sock = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
-    if(server._server_socket._fd_sock==INVALID_SOCKET)
-    {
-        std::cout<<"error in creating socket"<<GETSOCKETERRNO()<<std::endl;
-        exit(0);
-    }else
-        std::cout<<"socket successfully created"<<std::endl;
-}
 Socket::~Socket()
 {
     std::cout << "Socket : Destructor Called" << std::endl;
@@ -42,6 +33,19 @@ Socket	&Socket::operator= (const Socket &obj)
     return (*this);
 }
 
+bool Socket::createSocket(Server server) {
+
+    server._server_socket->_fd_sock = INVALID_SOCKET;
+    server._server_socket->_fd_sock = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
+    if(server._server_socket->_fd_sock==INVALID_SOCKET)
+    {
+        std::cout<<"error in creating socket"<<GETSOCKETERRNO()<<std::endl;
+        return false;
+    }else
+        std::cout<<"socket successfully created"<<std::endl;
+    return true;
+}
+
 /*
  * setsocketoption:
  * choose what option socket hav to do: keepalive etc... see the link in TODO for differnt option
@@ -49,7 +53,7 @@ Socket	&Socket::operator= (const Socket &obj)
 bool Socket::setSocketOption(Server server) {
     int optval = 1;
     //understand if the cast to char is necessary!!
-    if (setsockopt(server._server_socket._fd_sock, SOL_SOCKET, SO_REUSEADDR, (char *) &optval, sizeof(optval)) ==
+    if (setsockopt(server._server_socket->_fd_sock, SOL_SOCKET, SO_REUSEADDR, (char *) &optval, sizeof(optval)) ==
         SOCKET_ERROR) {
         std::cout << "cannot set socket option" << GETSOCKETERRNO() << std::endl;
         return false;
@@ -60,29 +64,15 @@ bool Socket::setSocketOption(Server server) {
 int Socket::getFdSock() const {
     return _fd_sock;
 }
-//void createSocket(Server server)
-//{
-//
-//    server._server_socket = INVALID_SOCKET;
-//    server._server_socket = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
-//    if(server._server_socket==INVALID_SOCKET)
-//    {
-//        std::cout<<"error in creating socket"<<GETSOCKETERRNO()<<std::endl;
-//        exit(0);
-//    }else
-//        std::cout<<"socket successfully created"<<std::endl;
-//}
-/*
- * probably we have to adapt the variable of the function to pass server and sockaddr_in
- * if _p== "localhost" fix it with 127.0.0.1
- */
+
 bool Socket::bindSocket(Server server) {
 //    sockaddr_in service;
     server._server_socket->_service.sin_family=AF_INET;
     //inet_addr or htonl
     server._server_socket->_service.sin_addr.s_addr= inet_addr(server._ip);
     server._server_socket->_service.sin_port= htons(server._port);
-    if((int)bind(server._server_socket._fd_sock,(sockaddr*)&server._server_socket->_service, sizeof(server._server_socket->_service)) == SOCKET_ERROR)
+    server._server_socket->_sockSize= sizeof(server._server_socket->_service);
+    if((int)bind(server._server_socket->_fd_sock,(sockaddr*)&server._server_socket->_service, sizeof(server._server_socket->_service)) == SOCKET_ERROR)
     {
         std::cout<<"bind failed"<<GETSOCKETERRNO()<<std::endl;
         return (false);
@@ -111,21 +101,17 @@ bool Socket::acceptConnection(Server *server, int epollFd, Webserver *webserver)
 //    if(acceptSocket==INVALID_SOCKET)
     Client client;
 
-    if((client._fd=accept(server->_fd,server->_server_socket._service, sizeof(server->_server_socket._service)))==INVALID_SOCKET)
+    if((client._clientSock->_fd_sock = accept(server->_server_socket->_fd_sock, (sockaddr *) &server->_server_socket->_service,&server->_server_socket->_sockSize)) == INVALID_SOCKET)
     {
         std::cout<<"accepted failed"<<GETSOCKETERRNO()<<std::endl;
         return false;
     }
     client._event.events=EPOLLIN | EPOLLOUT;
     client._event.data.ptr=&client;
-    client._type=CLIENT_SCOK;
+    client.socketType=CLIENT_SOCK;
     webserver->addClientToList(client);
-
-//    server->_event.events=EPOLLIN | EPOLLOUT;
-//    server->_event.data.ptr=&server;
-//    server->_type=CLIENT_SCOK;
-//    if(epoll_ctl(epollFd,EPOLL_CTL_ADD, server->_server_socket.getFdSock(), &server->_event)<1)
-    if(epoll_ctl(epollFd,EPOLL_CTL_ADD, client._fd, &client._event)<1)
+    fcntl(client._clientSock->_fd_sock,F_SETFL,O_NONBLOCK);
+    if(epoll_ctl(epollFd,EPOLL_CTL_ADD, client._clientSock->_fd_sock, &client._event)<1)
             return false;
     std::cout<<"client sock added to epoll instance"<<std::endl;
     return true;

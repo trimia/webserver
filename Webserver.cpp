@@ -40,10 +40,11 @@ bool Webserver::_initEpoll() {
 bool Webserver::_addServerToEpoll() {
     for (Server &item: this->_listOfServer)
     {
-        if(epoll_ctl(this->_epollFd,EPOLL_CTL_ADD, item._server_socket.getFdSock(), &item._event)<1)
+        if(epoll_ctl(this->_epollFd,EPOLL_CTL_ADD, item._server_socket->getFdSock(), &item._event)<1)
             return false;
         item._event.events=EPOLLIN;
         item._event.data.ptr=&item;
+        item.socketType=SERVER_SOCK;
 //        item.setType(SERVER_SOCK);
 
     }
@@ -66,9 +67,10 @@ bool Webserver::_mainLoop() {
 bool Webserver::_handleEpollEvents(int eventNumber, epoll_event (&events)[MAX_EVENTS]) {
     for (int i = 0; i < eventNumber; ++i)
     {
-        auto 	*ptr = static_cast<Server *>(events[i].data.ptr);
-        if(ptr->_type==SERVER_SOCK){
-            if(ptr->_server_socket.acceptConnection(ptr, this->_epollFd, this))
+        sType 	*ptr = static_cast<sType*>(events[i].data.ptr);
+        if(ptr->socketType==SERVER_SOCK){
+            Server *server = static_cast<Server *>(events[i].data.ptr);
+           if(server->_server_socket->acceptConnection(server, this->_epollFd, this))
                 return false;
         }
         else if(events[i].events && EPOLLIN | events[i].events && EPOLLOUT)

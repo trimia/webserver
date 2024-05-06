@@ -6,25 +6,27 @@
 #include "Request.hpp"
 #include "Webserver.hpp"
 #include "Server.hpp"
+#include "config.hpp"
 
 
 // ******************************************************** //
 //                         CLASSES                         //
 // ****************************************************** //
-class Response;
-class Request;
+//class Response;
+//class Request;
 class Webserver;
 class Server;
+class config;
 
 class	Socket
 {
 	public	:
 		Socket ();
-        Socket(Server server);
 		Socket (Socket const &obj);
 		~Socket ();
 		Socket &operator= (const Socket &obj);
         //choose what option socket hav to do: keepalive etc...
+        bool createSocket(Server server);
         bool setSocketOption(Server server);
         //server side
         //maybe int is better because of bind listen and accept return an int 0 or errno
@@ -42,9 +44,9 @@ class	Socket
 private	:
     //is necessary a pointer to server??
 //        Server          *_server;
-        int          _fd_sock;
+        int             _fd_sock;
         sockaddr_in     _service;
-//        socklen_t       _socksize;
+        socklen_t       _sockSize;
 
     //	DataType	attributes.
 };

@@ -9,7 +9,8 @@
 //                         CLASSES                         //
 // ****************************************************** //
 class Client;
-class Server;
+//class Server;
+
 class	Webserver
 {
 	public	:

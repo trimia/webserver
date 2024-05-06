@@ -44,9 +44,6 @@
 # include <arpa/inet.h>
 # include <fcntl.h>
 
-# include "Type.h"
-//# include "Socket.hpp"
-
 # define GETSOCKETERRNO() (errno)
 # define ISVALIDSOCKET(s) ((s) >= 0)
 # define CLOSESOCKET(s) close(s)
@@ -58,7 +55,7 @@
 # define MAX_EVENTS 1024
 # define EPOLL_TIMEOUT 2000
 # define SERVER_SOCK 1
-# define CLIENT_SCOK 2
+# define CLIENT_SOCK 2
 //# define EPOLL_SIZE 1000
 # define BUFFER 40000
 # define RED		"\033[0;31m"
@@ -73,7 +70,37 @@
 # define BUFFER_SIZE 4096
 # define DEFAULT_ERR_DIR "error_pages/"
 # define MIMETYPES_FILE_PATH "assets/mimeTypes.csv" //???
+struct sType
+{
+//    sType();
+//    sType(int n):socketType(n){}
+    int     socketType;
+    sType() { socketType=0;}
+};
 
+//sType::sType() {
+//
+//}
+
+//other file
+//# include "Location.hpp"
+//# include "config.hpp"
+//# include "Request.hpp"
+//# include "Response.hpp"
+//# include "Socket.hpp"
+//# include "Server.hpp"
+//# include "Client.hpp"
+//# include "Webserver.hpp"
+//# include "Parser.hpp"
+//class Location;
+//class config;
+//class Request;
+//class Response;
+//class Server;
+//class Socket;
+//class client;
+//class Webserver;
+//class Parser;
 extern int g_sigint; //????
 
 #endif

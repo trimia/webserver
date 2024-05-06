@@ -13,7 +13,12 @@ class	config
 	public	:
 		config ();
 		config (config const &obj);
-		~config ();
+
+    config(uint16_t port, char *ip, const std::string &serverName, const std::string &root, const std::string &index,
+           unsigned long clientMaxBodySize, bool autoindex, const std::map<short, std::string> &errorPages,
+           const std::vector<Location> &locations);
+
+    ~config ();
 		config &operator= (const config &obj);
 
     uint16_t getPort() const;

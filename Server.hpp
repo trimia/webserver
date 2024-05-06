@@ -5,14 +5,15 @@
 #include "Location.hpp"
 #include "Socket.hpp"
 #include "config.hpp"
-#include "Webserver.hpp"
+//#include "Webserver.hpp"
 
 // ******************************************************** //
 //                         CLASSES                         //
 // ****************************************************** //
+//class config;
 class Socket;
-class Webserver;
-class	Server //: public Type
+//class Webserver;
+class	Server : public sType
 {
 	public	:
         Server();
@@ -24,6 +25,10 @@ class	Server //: public Type
            const std::map<short, std::string> &errorPages, const std::vector<Location> &locations,
            Socket serverSocket);
 
+    Server(uint16_t port, char *ip, const std::string &serverName, const std::string &root, const std::string &index,
+           unsigned long clientMaxBodySize, bool autoindex, const std::map<short, std::string> &errorPages,
+           const std::vector<Location> &locations, Socket *serverSocket, const epoll_event &event);
+
     ~Server();
 		Server  &operator= (const Server &obj);
         Server    setupServer(config conf);
@@ -31,57 +36,52 @@ class	Server //: public Type
 
     uint16_t getPort() const;
 
-    in_addr_t getHost() const;
+    void setPort(uint16_t port);
+
+    char *getIp() const;
+
+    void setIp(char *ip);
 
     const std::string &getServerName() const;
 
-    const std::string &getRoot() const;
-
-    unsigned long getClientMaxBodySize() const;
-
-    const std::string &getIndex() const;
-
-    bool isAutoindex() const;
-
-    const std::map<short, std::string> &getErrorPages() const;
-
-    const std::vector<Location> &getLocations() const;
-
-    const sockaddr_in &getServerAddress() const;
-
-    int getFd() const;
-
-    void setPort(uint16_t port);
-
-    void setHost(in_addr_t host);
-
     void setServerName(const std::string &serverName);
+
+    const std::string &getRoot() const;
 
     void setRoot(const std::string &root);
 
-    void setClientMaxBodySize(unsigned long clientMaxBodySize);
+    const std::string &getIndex() const;
 
     void setIndex(const std::string &index);
 
+    unsigned long getClientMaxBodySize() const;
+
+    void setClientMaxBodySize(unsigned long clientMaxBodySize);
+
+    bool isAutoindex() const;
+
     void setAutoindex(bool autoindex);
+
+    const std::map<short, std::string> &getErrorPages() const;
 
     void setErrorPages(const std::map<short, std::string> &errorPages);
 
+    const std::vector<Location> &getLocations() const;
+
     void setLocations(const std::vector<Location> &locations);
 
-    void setServerAddress(const sockaddr_in &serverAddress);
+    Socket *getServerSocket() const;
 
-    void setFd(int fd);
+    void setServerSocket(Socket *serverSocket);
 
-    Socket getServerSock() const;
+    const epoll_event &getEvent() const;
 
-    Socket getServerSocket() const;
+    void setEvent(const epoll_event &event);
 
 
 private	:
         friend class Socket;
         friend class Webserver;
-//        std::vector<Server>             _listOfServer;
         uint16_t						_port;
         char *                          _ip;
         std::string						_server_name;
@@ -91,14 +91,14 @@ private	:
         bool							_autoindex;
         std::map<short, std::string>	_error_pages;
         std::vector<Location> 			_locations;
+        Socket                          *_server_socket;
+        epoll_event                     _event;
 //        in_addr_t						_host;
 //        struct sockaddr_in 				_server_address;
         //understand if _socket is necessary or _fd is good maybe have to change socket function return
-        Socket                          _server_socket;
-        int     						_fd;
+//        int     						_fd;
 //        int                             _epollFd;
-        int                             _type;
-        epoll_event                     _event;
+//        int                             _type;
 //        bool _initEpoll();
 //        bool _addServerToEpoll(std::vector<Server> listofserver);
 //        bool _mainLoop();
