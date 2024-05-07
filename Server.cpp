@@ -7,15 +7,13 @@ Server::Server()
 	std::cout << "Server : Default Constructor Called" << std::endl;
 }
 
-Server::Server(uint16_t port, char *ip, const std::string &serverName, const std::string &root,
-               const std::string &index, unsigned long clientMaxBodySize, bool autoindex,
-               const std::map<short, std::string> &errorPages, const std::vector<Location> &locations,
-               Socket *serverSocket, const epoll_event &event) : sType(), _port(port), _ip(ip), _server_name(serverName),
-                                                                 _root(root), _index(index),
-                                                                 _client_max_body_size(clientMaxBodySize),
-                                                                 _autoindex(autoindex), _error_pages(errorPages),
-                                                                 _locations(locations), _server_socket(serverSocket),
-                                                                 _event(event) {}
+Server::Server(uint16_t port, char *ip, std::string &serverName, std::string &root,
+               std::string &index, unsigned long clientMaxBodySize, bool autoindex,
+               std::map<short, std::string> &errorPages, std::vector<Location> &locations,
+               Socket *serverSocket):
+               sType(), _port(port), _ip(ip), _server_name(serverName),_root(root), _index(index),
+               _client_max_body_size(clientMaxBodySize),_autoindex(autoindex), _error_pages(errorPages),
+               _locations(locations), _server_socket(serverSocket){}
 Server::~Server()
 {
 	std::cout << "Server : Destructor Called" << std::endl;
@@ -61,11 +59,19 @@ Server	&Server::operator= (const Server &obj)
 Server    setupServer(config conf)
 {
 
-    Server server(
-            conf.getPort(), conf.getIp(), conf.getServerName(),
-            conf.getRoot(), conf.getIndex(), conf.getClientMaxBodySize(),
-            conf.isAutoindex(), conf.getErrorPages(), conf.getLocations(), Socket());
     Socket sock;
+    //TODO maybe best practise is config subclass o server o inherit from it and we build server(conf) with copy constructor
+    Server server;
+    server.setPort(conf.getPort());
+    server.setIp(conf.getIp());
+    server.setServerName(conf.getServerName());
+    server.setRoot(conf.getRoot());
+    server.setIndex(conf.getIndex());
+    server.setClientMaxBodySize(conf.getClientMaxBodySize());
+    server.setAutoindex(conf.isAutoindex());
+    server.setErrorPages(conf.getErrorPages());
+    server.setLocations(conf.getLocations());
+//    server.setServerSocket(&sock);
     sock.createSocket(server);
     sock.setSocketOption(server);
     sock.bindSocket(server);

@@ -20,14 +20,9 @@ class	Server : public sType
 		Server(Server const &obj);
 
 
-    Server(uint16_t port, char *ip, const std::string &serverName, const std::string &root,
-           const std::string &index, unsigned long clientMaxBodySize, bool autoindex,
-           const std::map<short, std::string> &errorPages, const std::vector<Location> &locations,
-           Socket serverSocket);
-
-    Server(uint16_t port, char *ip, const std::string &serverName, const std::string &root, const std::string &index,
-           unsigned long clientMaxBodySize, bool autoindex, const std::map<short, std::string> &errorPages,
-           const std::vector<Location> &locations, Socket *serverSocket, const epoll_event &event);
+    Server(uint16_t port, char *ip, std::string &serverName, std::string &root, std::string &index,
+           unsigned long clientMaxBodySize, bool autoindex, std::map<short, std::string> &errorPages,
+           std::vector<Location> &locations, Socket *serverSocket);
 
     ~Server();
 		Server  &operator= (const Server &obj);

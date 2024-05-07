@@ -33,7 +33,8 @@
 # include <unistd.h>
 
 // # include <machine/types.h>
-# include <signal.h>
+//# include <signal.h>
+# include "csignal"
 
 /* Network */
 # include <sys/socket.h>
@@ -44,6 +45,7 @@
 # include <arpa/inet.h>
 # include <fcntl.h>
 
+# define BUFFER_SIZE 4096
 # define GETSOCKETERRNO() (errno)
 # define ISVALIDSOCKET(s) ((s) >= 0)
 # define CLOSESOCKET(s) close(s)
@@ -65,9 +67,8 @@
 # define MAGENTA	"\033[0;35m"
 # define CYAN		"\033[0;36m"
 # define WHITE		"\033[0;37m"
-# define RESET_COLOR "\033[0m"
 
-# define BUFFER_SIZE 4096
+# define RESET_COLOR "\033[0m"
 # define DEFAULT_ERR_DIR "error_pages/"
 # define MIMETYPES_FILE_PATH "assets/mimeTypes.csv" //???
 struct sType

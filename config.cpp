@@ -5,13 +5,12 @@ config::config()
 	std::cout << "config : Default Constructor Called" << std::endl;
 }
 
-config::config(uint16_t port, char *ip, const std::string &serverName, const std::string &root,
-               const std::string &index, unsigned long clientMaxBodySize, bool autoindex,
+config::config(uint16_t port, char *ip,  std::string &serverName, std::string &root,
+               std::string &index, unsigned long clientMaxBodySize, bool autoindex,
                const std::map<short, std::string> &errorPages, const std::vector<Location> &locations) :
                _port(port),_ip(ip),_server_name(serverName),_root(root),_index(index),
                _client_max_body_size(clientMaxBodySize),_autoindex(autoindex),
-               _error_pages(errorPages){}
-//               ,_locations(locations) {}
+               _error_pages(errorPages),_locations(locations) {}
 
 config::~config()
 {

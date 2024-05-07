@@ -23,7 +23,10 @@ class	Socket
 	public	:
 		Socket ();
 		Socket (Socket const &obj);
-		~Socket ();
+
+    explicit Socket(int fdSock);
+
+    ~Socket ();
 		Socket &operator= (const Socket &obj);
         //choose what option socket hav to do: keepalive etc...
         bool createSocket(Server server);

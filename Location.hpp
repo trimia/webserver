@@ -11,8 +11,16 @@ class	Location
 {
 	public	:
 		Location ();
+
 		Location (Location const &obj);
-		~Location ();
+
+
+
+    Location(const std::string &path, const std::string &root, bool autoindex, const std::string &index,
+             const std::vector<short> &methods, std::string ret, std::string alias, std::vector<std::string> cgiPath,
+             std::vector<std::string> cgiExt, unsigned long clientMaxBodySize);
+
+    ~Location ();
 		Location &operator= (const Location &obj);
 
 	private	:
@@ -24,10 +32,10 @@ class	Location
         std::vector<short>			_methods; // GET+ POST- DELETE- PUT- HEAD-
         std::string					_return;
         std::string					_alias;
-        std::vector<std::string>	_cgi_path;
-        std::vector<std::string>	_cgi_ext;
-        unsigned long				_client_max_body_size;
-
+        //is necessary?
+        std::vector<std::string>	_cgiPath;
+        std::vector<std::string>	_cgiExt;
+        unsigned long				_clientMaxBodySize;
     //	DataType	attributes.
 };
 

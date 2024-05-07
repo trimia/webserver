@@ -14,9 +14,9 @@ class	config
 		config ();
 		config (config const &obj);
 
-    config(uint16_t port, char *ip, const std::string &serverName, const std::string &root, const std::string &index,
-           unsigned long clientMaxBodySize, bool autoindex, const std::map<short, std::string> &errorPages,
-           const std::vector<Location> &locations);
+    config(uint16_t port, char *ip, std::string &serverName, std::string &root,
+           std::string &index, unsigned long clientMaxBodySize, bool autoindex,
+           const std::map<short, std::string> &errorPages, const std::vector<Location> &locations);
 
     ~config ();
 		config &operator= (const config &obj);

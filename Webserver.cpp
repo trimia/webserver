@@ -100,6 +100,7 @@ bool Webserver::_handleConnection(epoll_event (&events)[MAX_EVENTS],int i) {
 
     int str_len;
     void *buf;
+    buf=(void *)"";
     str_len = read(events[i].data.fd, buf, BUFFER_SIZE);
     if (str_len == 0) // close request!
     {

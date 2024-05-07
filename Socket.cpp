@@ -6,6 +6,8 @@ Socket::Socket() {
 
 }
 
+Socket::Socket(int fdSock) : _fd_sock(fdSock) {}
+
 Socket::~Socket()
 {
     std::cout << "Socket : Destructor Called" << std::endl;
